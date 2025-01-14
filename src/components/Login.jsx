@@ -1,9 +1,15 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import { loginAction } from '../store/Auth/actions';
+import { useNavigate } from "react-router-dom";
+import {notification} from 'antd'
 const Login = () => {
+  const auth = useSelector(state => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -18,29 +24,15 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await mockLoginAPI(formData);
-      if (response.success) {
-        // Navigate to dashboard
-      }
-    } catch (err) {
-      setError('Invalid credentials');
+    console.log("DATA", formData, auth)
+   const isLoggedIn = await loginAction(formData)(dispatch)
+    if(isLoggedIn){
+      notification.success({message:"User logged in successfully"})
+      navigate("/dashboard")
     }
   };
 
-  const mockLoginAPI = async (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (data.email === 'admin@example.com' && data.password === 'admin123') {
-          resolve({ success: true, role: 'admin' });
-        } else if (data.email === 'officer@example.com' && data.password === 'officer123') {
-          resolve({ success: true, role: 'stockOfficer' });
-        } else {
-          throw new Error('Invalid credentials');
-        }
-      }, 1000);
-    });
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -65,13 +57,12 @@ const Login = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                username
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
                 required
                 className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                 placeholder="Enter your email"

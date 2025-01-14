@@ -1,17 +1,24 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import { registerAction } from '../store/Auth/actions';
+import { useNavigate } from "react-router-dom";
+import {notification} from 'antd'
 const Signup = () => {
+  const auth = useSelector(state => state.auth)
+  const dispatch = useDispatch()
+const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    username: '',
     password: '',
-    role: 'stockOfficer',
+    role: 'stock_officer',
   });
   const [error] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("nameee",name)
+    console.log("valuee",value)
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -20,7 +27,17 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement signup logic
+
+    console.log("DATA", formData)
+
+ const isRegistered =  await registerAction(formData)(dispatch)
+if(isRegistered){
+  notification.success({message:"Account created successfully"})
+  navigate("/login")
+}else{
+  notification.error({message:"Failed to create account"})
+}
+    
   };
 
   return (
@@ -46,35 +63,21 @@ const Signup = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full name
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
               </label>
               <input
-                id="name"
-                name="name"
+                id="username"
+                name="username"
                 type="text"
                 required
                 className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="Enter your full name"
+                placeholder="Enter your full username"
                 value={formData.name}
                 onChange={handleChange}
               />
             </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
+           
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
@@ -101,7 +104,7 @@ const Signup = () => {
                 value={formData.role}
                 onChange={handleChange}
               >
-                <option value="stockOfficer">Stock Officer</option>
+                <option value="stock_officer">Stock Officer</option>
                 <option value="admin">Admin</option>
               </select>
             </div>

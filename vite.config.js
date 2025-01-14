@@ -14,4 +14,14 @@ export default defineConfig({
       ],
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',  // Your backend server
+        changeOrigin: true,
+        secure: false,  // If your backend server uses HTTP and not HTTPS
+        // rewrite: (path) => path.replace(/^\/api/, '')  // Optional: remove `/api` prefix
+      }
+    }
+  }
 })
